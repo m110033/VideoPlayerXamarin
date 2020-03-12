@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -13,16 +14,35 @@ namespace VideoPlayer.FrontEnd
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class VideoList : ContentPage
     {
+        private Common.Tools tool { get; set; }
+
         public ObservableCollection<Common.VideoViewModel> videos { get; set; }
-        public VideoList()
+
+        public VideoList(String videoUrl)
         {
             InitializeComponent();
-
+            if (tool == null)
+            {
+                tool = new Common.Tools();
+            }
+            String html = tool.GetHtml(videoUrl);
             videos = new ObservableCollection<Common.VideoViewModel>();
-            videos.Add(new Common.VideoViewModel { Name = "Tomato", Type = "Fruit", Image = "tomato.png" });
-            videos.Add(new Common.VideoViewModel { Name = "Romaine Lettuce", Type = "Vegetable", Image = "lettuce.png" });
-            videos.Add(new Common.VideoViewModel { Name = "Zucchini", Type = "Vegetable", Image = "zucchini.png" });
+            Common.Video jsonObj = JsonConvert.DeserializeObject<Common.Video>(html);
+            for (int i = jsonObj.video.Count - 1; i >= 0; i--)
+            {
+                Common.VideoData video = jsonObj.video[i];
+                videos.Add(new Common.VideoViewModel { Name = video.m_t, Type = video.m_s_t, Image = video.m_img, Link = video.m_p_l });
+            }
             lstView.ItemsSource = videos;
+            lstView.ItemSelected += ListView_ItemSelected;
+        }
+
+        async private void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+        {
+            var item = e.SelectedItem as Common.VideoViewModel;
+            if (item == null)
+                return;
+            await Navigation.PushAsync(new VideoDetail(item.Link));
         }
     }
 }

@@ -24,7 +24,7 @@ namespace VideoPlayer.FrontEnd
             if (item == null)
                 return;
 
-            var page = (VideoList)Activator.CreateInstance(item.TargetType);
+            var page = (VideoList)Activator.CreateInstance(item.TargetType, item.Link);
             page.Title = item.Title;
 
             Detail = new NavigationPage(page);

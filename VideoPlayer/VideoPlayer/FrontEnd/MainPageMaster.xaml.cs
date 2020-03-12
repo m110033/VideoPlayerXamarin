@@ -31,13 +31,17 @@ namespace VideoPlayer.FrontEnd
 
             public MainPageMasterViewModel()
             {
+                String hostUrl = "https://drive.google.com/uc?export=download&id=";
                 MenuItems = new ObservableCollection<MainPageMasterMenuItem>(new[]
                 {
-                    new MainPageMasterMenuItem { Id = 0, Title = "Page 1", TargetType = typeof(VideoList) },
-                    new MainPageMasterMenuItem { Id = 1, Title = "Page 2", TargetType = typeof(VideoList) },
-                    new MainPageMasterMenuItem { Id = 2, Title = "Page 3", TargetType = typeof(VideoList) },
-                    new MainPageMasterMenuItem { Id = 3, Title = "Page 4", TargetType = typeof(VideoList) },
-                    new MainPageMasterMenuItem { Id = 4, Title = "Page 5", TargetType = typeof(VideoList) },
+                    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1d2AQ-8rF9HxuioMwK9Uu2ujVgTiFxf0z"), Title = "動漫", TargetType = typeof(VideoList) },
+                    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1iUIcp-IeD8rjn-a84uS9MoslYeoBWe5X"), Title = "電影", TargetType = typeof(VideoList) },
+                    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1gkrl_72IZnsnDKNkcJhkeXGmfmBb73qK"), Title = "陸劇", TargetType = typeof(VideoList) },
+                    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1ZYjAzED4n6UxgiJvmgoB7jSyLUX7dX_d"), Title = "日劇", TargetType = typeof(VideoList) },
+                    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "18gxyuOnIK7LCZON-Q6a3YMuWiAhSK6NV"), Title = "韓劇", TargetType = typeof(VideoList) },
+                    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1vYffF2yHm4Ir0wumoWU-J3uDf-T3wGsY"), Title = "連戲劇", TargetType = typeof(VideoList) },
+                    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1Cg7vGk_lHhjs62Tgy5lYDWx_sNIdc4SA"), Title = "港劇", TargetType = typeof(VideoList) },
+                    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1HbvikpZuXhQq5RhTPwwM0VrmFbPLmWBR"), Title = "美劇", TargetType = typeof(VideoList) },
                 });
             }
 

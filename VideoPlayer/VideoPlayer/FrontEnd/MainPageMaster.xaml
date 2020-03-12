@@ -8,17 +8,10 @@
              x:Class="VideoPlayer.FrontEnd.MainPageMaster"
              Title="Master">
   <StackLayout>
-    <ListView x:Name="MenuItemsListView"
+        <ListView x:Name="MenuItemsListView"
               SeparatorVisibility="None"
               HasUnevenRows="true"
               ItemsSource="{Binding MenuItems}">
-            <d:ListView.ItemsSource>
-                <x:Array Type="{x:Type local:MainPageMasterMenuItem}">
-                    <local:MainPageMasterMenuItem Title="Contacts" Id="0" TargetType="{x:Type local:MainPageDetail}" />
-                    <local:MainPageMasterMenuItem Title="TodoList" Id="1" TargetType="{x:Type local:MainPageDetail}" />
-                    <local:MainPageMasterMenuItem Title="Reminders" Id="2" TargetType="{x:Type local:MainPageDetail}" />
-                </x:Array>
-            </d:ListView.ItemsSource>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
