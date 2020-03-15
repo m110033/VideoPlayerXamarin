@@ -18,6 +18,8 @@ namespace VideoPlayer.FrontEnd
 
         public string Link { get; set; }
 
+        public string IconSource { get; set; }
+
         public Type TargetType { get; set; }
     }
 }

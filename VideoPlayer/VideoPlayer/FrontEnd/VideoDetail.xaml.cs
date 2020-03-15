@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
@@ -24,6 +25,19 @@ namespace VideoPlayer.FrontEnd
         {
             InitializeComponent();
 
+            defaultActivityIndicator.IsRunning = true;
+            lstView.IsVisible = false;
+
+            Thread t = new Thread(() =>
+            {
+                LoadData(videoUrl);
+            });
+            t.IsBackground = true;
+            t.Start();
+        }
+
+        async private void LoadData(String videoUrl)
+        {
             if (tool == null)
             {
                 tool = new Common.Tools();
@@ -33,25 +47,8 @@ namespace VideoPlayer.FrontEnd
             HtmlDocument document = new HtmlDocument();
             //your html stream
             document.LoadHtml(html);
-            // Get Image Link
-            var container = document.DocumentNode.Descendants("div").FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "videoPic");
-            if (container != null)
-            {
-                var image = container.Descendants("img").FirstOrDefault(x => x.Attributes.Contains("src"));
-                if (image != null)
-                {
-                    videoImage.Source = String.Format("{0}/{1}", hostUrl, image.Attributes["src"].Value);
-                }
-            }
-            // Get Video Detail
-            container = document.DocumentNode.Descendants("div").FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "videoDetail");
-            if (container != null)
-            {
-                videoDescription.Text = container.InnerText.Trim();
-            }
             Regex regex = new Regex("value=\"(.*?)\\$(.*?).m3u8\" checked=\"", RegexOptions.Multiline);
             MatchCollection matches = regex.Matches(html);
-
             videos = new ObservableCollection<Common.VideoViewModel>();
             foreach (Match match in matches)
             {
@@ -60,8 +57,31 @@ namespace VideoPlayer.FrontEnd
                 String link = groups[2].Value.Trim() + ".m3u8";
                 videos.Add(new Common.VideoViewModel { Name = title, Type = "", Image = "", Link = link });
             }
-            lstView.ItemsSource = videos;
-            lstView.ItemSelected += ListView_ItemSelected;
+            Device.BeginInvokeOnMainThread(() => {
+                // Get Image Link
+                var container = document.DocumentNode.Descendants("div").FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "videoPic");
+                if (container != null)
+                {
+                    var image = container.Descendants("img").FirstOrDefault(x => x.Attributes.Contains("src"));
+                    if (image != null)
+                    {
+                        videoImage.Source = String.Format("{0}/{1}", hostUrl, image.Attributes["src"].Value);
+                    }
+                }
+                // Get Video Detail
+                container = document.DocumentNode.Descendants("div").FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "videoDetail");
+                if (container != null)
+                {
+                    String content = container.InnerText.Trim();
+                    //content = tool.PostHtml("https://convert.cdict.info/g2btext.php", content);
+                    videoDescription.Text = content;
+                }
+                lstView.ItemsSource = videos;
+                lstView.ItemSelected += ListView_ItemSelected;
+                defaultActivityIndicator.IsRunning = false;
+                lstView.IsVisible = true;
+            });
+
         }
 
         async private void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)

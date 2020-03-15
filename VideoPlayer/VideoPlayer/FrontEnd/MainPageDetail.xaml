@@ -5,8 +5,24 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="VideoPlayer.FrontEnd.MainPageDetail"
-             Title="Detail">
-  <StackLayout Padding="10">
-    <Label Text="This is a detail page. To get the 'triple' line icon on each platform add a icon to each platform and update the 'Master' page with an Icon that references it."/>
-  </StackLayout>
+             Title="最新影視">
+  <StackLayout>
+        <Label Text="本軟體絕不儲存影視內容，資源皆來自網路" VerticalOptions="Center" TextColor="#A30000" FontAttributes="Bold" Padding="5"/>
+        <ListView x:Name="lstView" RowHeight="60">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="Fill">
+                            <Image Source="{Binding Image}" HorizontalOptions="Start" HeightRequest="50" WidthRequest="50" Aspect="Fill"/>
+                            <StackLayout Orientation="Vertical">
+                                <Label Text = "{Binding Name}" FontSize="24"/>
+                                <Label Text = "{Binding Date}"/>
+                            </StackLayout>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <ActivityIndicator x:Name="defaultActivityIndicator" VerticalOptions="CenterAndExpand" HorizontalOptions="Fill" />
+    </StackLayout>
 </ContentPage>

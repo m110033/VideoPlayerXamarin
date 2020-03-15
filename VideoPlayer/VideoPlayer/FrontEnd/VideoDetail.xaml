@@ -7,6 +7,9 @@
              x:Class="VideoPlayer.FrontEnd.VideoDetail">
     <ContentPage.Content>
         <StackLayout>
+            <ActivityIndicator x:Name="defaultActivityIndicator"
+                VerticalOptions="CenterAndExpand"
+                HorizontalOptions="Fill" />
             <StackLayout Orientation="Horizontal" HorizontalOptions="Fill">
                 <Image x:Name="videoImage" Source="{Binding Image}" HorizontalOptions="Start" HeightRequest="200" WidthRequest="200" Aspect="Fill"/>
                 <StackLayout Orientation="Vertical">

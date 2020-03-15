@@ -6,20 +6,25 @@
              mc:Ignorable="d"
              x:Class="VideoPlayer.FrontEnd.VideoList">
     <ContentPage.Content>
-        <ListView  x:Name="lstView" RowHeight="60">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <StackLayout Orientation="Horizontal" HorizontalOptions="Fill">
-                            <Image Source="{Binding Image}" HorizontalOptions="Start" HeightRequest="50" WidthRequest="50" Aspect="Fill"/>
-                            <StackLayout Orientation="Vertical">
-                                <Label Text = "{Binding Name}" FontSize="24"/>
-                                <Label Text = "{Binding Type}"/>
+        <StackLayout Orientation="Vertical">
+            <ActivityIndicator x:Name="defaultActivityIndicator"
+                VerticalOptions="CenterAndExpand"
+                HorizontalOptions="Fill" />
+            <ListView x:Name="lstView" RowHeight="60">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="Fill">
+                                <Image Source="{Binding Image}" HorizontalOptions="Start" HeightRequest="50" WidthRequest="50" Aspect="Fill"/>
+                                <StackLayout Orientation="Vertical">
+                                    <Label Text = "{Binding Name}" FontSize="24"/>
+                                    <Label Text = "{Binding Type}"/>
+                                </StackLayout>
                             </StackLayout>
-                        </StackLayout>
-                    </ViewCell>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
     </ContentPage.Content>
 </ContentPage>

@@ -1,0 +1,2 @@
+MainPackage=D:\GitHub\VideoPlayerXamarin\VideoPlayer\VideoPlayer.UWP\bin\x86\Release\VideoPlayer.UWP_1.0.3.0_x86.appx
+SymbolPackage=D:\GitHub\VideoPlayerXamarin\VideoPlayer\VideoPlayer.UWP\obj\x86\Release\Symbols\VideoPlayer.UWP_1.0.3.0_x86.appxsym

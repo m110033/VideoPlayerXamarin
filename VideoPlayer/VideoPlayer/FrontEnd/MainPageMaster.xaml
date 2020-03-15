@@ -7,7 +7,18 @@
              xmlns:local="using:VideoPlayer.FrontEnd"
              x:Class="VideoPlayer.FrontEnd.MainPageMaster"
              Title="Master">
-  <StackLayout>
+    <StackLayout Orientation="Vertical">
+        <StackLayout BackgroundColor="#1381AF"
+                     HeightRequest="200"
+                     Padding="0, 30, 0, 0">
+            <Image Source="https://i.imgur.com/NIdWrup.png" HeightRequest="120" WidthRequest="120" VerticalOptions="Center"/>
+            <Label x:Name="lblMessage" FontSize="Medium" HorizontalOptions="Center" TextColor="White" Text="影視洪流"/>
+            <Label Text=""
+                 FontSize="20"
+                 VerticalOptions="CenterAndExpand"
+                 TextColor="White"
+                 HorizontalOptions="Center"/>
+        </StackLayout>
         <ListView x:Name="MenuItemsListView"
               SeparatorVisibility="None"
               HasUnevenRows="true"
@@ -20,7 +31,7 @@
                                 <ColumnDefinition Width="30"/>
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Image Source="{Binding IconSource}" />
+                            <Image Source="{Binding IconSource}" HeightRequest="20" WidthRequest="20" Aspect="AspectFit"/>
                             <Label Grid.Column="1" Text="{Binding Title}" />
                         </Grid>
                     </ViewCell>

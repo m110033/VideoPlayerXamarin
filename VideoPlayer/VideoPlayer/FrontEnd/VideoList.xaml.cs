@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Xamarin.Forms;
@@ -21,6 +22,20 @@ namespace VideoPlayer.FrontEnd
         public VideoList(String videoUrl)
         {
             InitializeComponent();
+
+            defaultActivityIndicator.IsRunning = true;
+            lstView.IsVisible = false;
+
+            Thread t = new Thread(() =>
+            {
+                LoadData(videoUrl);
+            });
+            t.IsBackground = true;
+            t.Start();
+        }
+
+        async private void LoadData(String videoUrl)
+        {
             if (tool == null)
             {
                 tool = new Common.Tools();
@@ -33,8 +48,13 @@ namespace VideoPlayer.FrontEnd
                 Common.VideoData video = jsonObj.video[i];
                 videos.Add(new Common.VideoViewModel { Name = video.m_t, Type = video.m_s_t, Image = video.m_img, Link = video.m_p_l });
             }
-            lstView.ItemsSource = videos;
-            lstView.ItemSelected += ListView_ItemSelected;
+            Device.BeginInvokeOnMainThread(() => {
+                lstView.ItemsSource = videos;
+                lstView.ItemSelected += ListView_ItemSelected;
+                defaultActivityIndicator.IsRunning = false;
+                lstView.IsVisible = true;
+            });
+            
         }
 
         async private void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
