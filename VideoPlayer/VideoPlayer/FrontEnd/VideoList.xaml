@@ -25,6 +25,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+            <Button x:Name="loadMoreButton" HorizontalOptions="Fill" Text="讀取更多" BackgroundColor="Transparent"></Button>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

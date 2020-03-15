@@ -41,10 +41,6 @@ namespace VideoPlayer.FrontEnd
             }
             String hostUrl = "https://www.jikzy.com"; 
             String html = tool.GetHtml(hostUrl);
-            //html = tool.PostHtml("https://convert.cdict.info/g2btext.php", html);
-            HtmlDocument document = new HtmlDocument();
-            //your html stream
-            document.LoadHtml(html);
             Regex regex = new Regex("<td class=\"l\"><a href=\"(.*?)\" target|_blank\">(.*?)<font color=\"red\">(.*?)</font>|<a href=\"(.*?)\" target=\"_blank\">(.*?)</a>|(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})", RegexOptions.Multiline);
             MatchCollection matches = regex.Matches(html);
             videos = new ObservableCollection<Common.VideoViewModel>();
@@ -72,6 +68,16 @@ namespace VideoPlayer.FrontEnd
                 {
                     Console.WriteLine(ex.Message);
                 }
+            }
+            List<String> titleList = new List<String>();
+            for(int i = 0; i < videos.Count; i++)
+            {
+                titleList.Add(videos[i].Name);
+            }
+            titleList = tool.PostHtml("http://www.khngai.com/chinese/tools/convert.php", titleList);
+            for (int i = 0; i < videos.Count; i++)
+            {
+                videos[i].Name = titleList[i];
             }
             Device.BeginInvokeOnMainThread(() => {
                 lstView.ItemsSource = videos;

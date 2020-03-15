@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -23,17 +24,26 @@ namespace VideoPlayer.Common
             return response.Content.ReadAsStringAsync().Result;
         }
 
-        public String PostHtml(String url, String data)
+        public List<String> PostHtml(String url, List<String> dataList)
         {
             HttpClient client = new HttpClient();
-            string FormStuff = string.Format("textbody={0}", data);
+            String data = String.Join("<br>", dataList.ToArray());
+            string FormStuff = string.Format("data={0}&action=Simplified to Traditional", data);
             StringContent content = new StringContent(FormStuff, Encoding.UTF8, "application/x-www-form-urlencoded");
             HttpResponseMessage response = client.PostAsync(url, content).GetAwaiter().GetResult();
             String tempHtml = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-            String target = "<textarea class=\"inputc\" id=\"textall\" readonly=\"readonly\">";
-            int s = tempHtml.IndexOf(target) + target.Length;
-            int e = tempHtml.IndexOf("</textarea") - s;
-            return tempHtml.Substring(s, e);
+            HtmlDocument document = new HtmlDocument();
+            document.LoadHtml(tempHtml);
+            var container = document.DocumentNode.Descendants("textarea").FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "wsuni");
+            if (container != null)
+            {
+                String result = container.InnerText.Trim();
+                return result.Split(new String[] { "<br>" }, StringSplitOptions.None).ToList();
+            }
+            else
+            {
+                return new List<String>();
+            }
         }
     }
 }

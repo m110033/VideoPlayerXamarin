@@ -73,8 +73,10 @@ namespace VideoPlayer.FrontEnd
                 if (container != null)
                 {
                     String content = container.InnerText.Trim();
-                    //content = tool.PostHtml("https://convert.cdict.info/g2btext.php", content);
-                    videoDescription.Text = content;
+                    List<String> contentList = new List<String>();
+                    contentList.Add(content);
+                    contentList = tool.PostHtml("http://www.khngai.com/chinese/tools/convert.php", contentList);
+                    videoDescription.Text = contentList.First();
                 }
                 lstView.ItemsSource = videos;
                 lstView.ItemSelected += ListView_ItemSelected;
