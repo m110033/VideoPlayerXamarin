@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using VideoPlayer.Parser;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -19,71 +20,46 @@ namespace VideoPlayer.FrontEnd
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class VideoDetail : ContentPage
     {
-        private Common.Tools tool { get; set; }
+        private String site = "";
+        private String videoUrl = "";
+        private IPageParser pageParser;
+        private Common.Tools tool = new Common.Tools();
         public ObservableCollection<Common.VideoViewModel> videos { get; set; }
-        public VideoDetail(String videoUrl)
+        public VideoDetail(String site, String videoUrl)
         {
             InitializeComponent();
-
+            this.site = site;
+            this.videoUrl = videoUrl;
+            // Get Parser
+            switch (this.site)
+            {
+                case "zuidazy":
+                    pageParser = new ZUIDAZY();
+                    break;
+                case "jikzy":
+                    pageParser = new JIKZY();
+                    break;
+            }
+            videos = new ObservableCollection<Common.VideoViewModel>();
+            lstView.ItemsSource = videos;
+            lstView.ItemSelected += ListView_ItemSelected;
+            LoadData();
+        }
+        private void LoadData()
+        {
             defaultActivityIndicator.IsRunning = true;
             lstView.IsVisible = false;
-
-            Thread t = new Thread(() =>
+            Task.Run(async () =>
             {
-                LoadData(videoUrl);
+                Common.VideoDetailModel vdm = pageParser.GetDetail(videoUrl);
+                Device.BeginInvokeOnMainThread(() => {
+                    foreach (var item in vdm.Vvm) videos.Add(item);
+                    videoImage.Source = vdm.Image;
+                    videoDescription.Text = vdm.Description;
+                    defaultActivityIndicator.IsRunning = false;
+                    lstView.IsVisible = true;
+                });
             });
-            t.IsBackground = true;
-            t.Start();
-        }
-
-        async private void LoadData(String videoUrl)
-        {
-            if (tool == null)
-            {
-                tool = new Common.Tools();
-            }
-            String html = tool.GetHtml(videoUrl);
-            String hostUrl = "https://www.jikzy.com";
-            HtmlDocument document = new HtmlDocument();
-            //your html stream
-            document.LoadHtml(html);
-            Regex regex = new Regex("value=\"(.*?)\\$(.*?).m3u8\" checked=\"", RegexOptions.Multiline);
-            MatchCollection matches = regex.Matches(html);
-            videos = new ObservableCollection<Common.VideoViewModel>();
-            foreach (Match match in matches)
-            {
-                GroupCollection groups = match.Groups;
-                String title = groups[1].Value.Trim();
-                String link = groups[2].Value.Trim() + ".m3u8";
-                videos.Add(new Common.VideoViewModel { Name = title, Type = "", Image = "", Link = link });
-            }
-            Device.BeginInvokeOnMainThread(() => {
-                // Get Image Link
-                var container = document.DocumentNode.Descendants("div").FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "videoPic");
-                if (container != null)
-                {
-                    var image = container.Descendants("img").FirstOrDefault(x => x.Attributes.Contains("src"));
-                    if (image != null)
-                    {
-                        videoImage.Source = String.Format("{0}/{1}", hostUrl, image.Attributes["src"].Value);
-                    }
-                }
-                // Get Video Detail
-                container = document.DocumentNode.Descendants("div").FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "videoDetail");
-                if (container != null)
-                {
-                    String content = container.InnerText.Trim();
-                    List<String> contentList = new List<String>();
-                    contentList.Add(content);
-                    contentList = tool.PostHtml("http://www.khngai.com/chinese/tools/convert.php", contentList);
-                    videoDescription.Text = contentList.First();
-                }
-                lstView.ItemsSource = videos;
-                lstView.ItemSelected += ListView_ItemSelected;
-                defaultActivityIndicator.IsRunning = false;
-                lstView.IsVisible = true;
-            });
-
         }
 
         async private void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)

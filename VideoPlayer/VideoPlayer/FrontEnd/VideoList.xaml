@@ -7,18 +7,19 @@
              x:Class="VideoPlayer.FrontEnd.VideoList">
     <ContentPage.Content>
         <StackLayout Orientation="Vertical">
-            <ActivityIndicator x:Name="defaultActivityIndicator"
-                VerticalOptions="CenterAndExpand"
-                HorizontalOptions="Fill" />
-            <ListView x:Name="lstView" RowHeight="60">
+            <SearchBar x:Name="listSearch" Placeholder="尋找..." TextChanged="SearchBar_TextChanged"/>
+            <ListView x:Name="listView" RowHeight="60">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <StackLayout Orientation="Horizontal" HorizontalOptions="Fill">
-                                <Image Source="{Binding Image}" HorizontalOptions="Start" HeightRequest="50" WidthRequest="50" Aspect="Fill"/>
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="Fill" Margin="10,0,10,0">
+                                <ImageButton Source="{Binding Image}" HorizontalOptions="Start" HeightRequest="20" WidthRequest="20" Aspect="AspectFit" Clicked="FavoriteButton_Clicked"/>
+                                <!--<Image Source="{Binding Image}" HorizontalOptions="Start" HeightRequest="20" WidthRequest="20" Aspect="AspectFit" />-->
                                 <StackLayout Orientation="Vertical">
                                     <Label Text = "{Binding Name}" FontSize="24"/>
-                                    <Label Text = "{Binding Type}"/>
+                                    <Label Text = "{Binding Date}"/>
+                                    <Label Text = "{Binding Link}" IsVisible="False"/>
+                                    <Label Text = "{Binding ID}" IsVisible="False"/>
                                 </StackLayout>
                             </StackLayout>
                         </ViewCell>
@@ -26,6 +27,7 @@
                 </ListView.ItemTemplate>
             </ListView>
             <Button x:Name="loadMoreButton" HorizontalOptions="Fill" Text="讀取更多" BackgroundColor="Transparent"></Button>
+            <ActivityIndicator x:Name="defaultActivityIndicator" VerticalOptions="CenterAndExpand" HorizontalOptions="Fill" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

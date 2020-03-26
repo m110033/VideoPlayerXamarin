@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-
+using VideoPlayer.Parser;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -15,57 +15,48 @@ namespace VideoPlayer.FrontEnd
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MainPageMaster : ContentPage
     {
+        private JIKZY jikzy = new JIKZY();
+        private ZUIDAZY zuidazy = new ZUIDAZY();
+        private Common.Database database = new Common.Database();
+        private ObservableCollection<MainPageMasterMenuItem> menuItems = new ObservableCollection<MainPageMasterMenuItem>();
         public ListView ListView;
-
         public MainPageMaster()
         {
             InitializeComponent();
-
-            BindingContext = new MainPageMasterViewModel();
+            if (Device.RuntimePlatform == Device.UWP)
+            {
+                restoreBtn.IsVisible = backupBtn.IsVisible = true;
+            }
             ListView = MenuItemsListView;
+            MenuPicker.Items.Add("jikzy");
+            MenuPicker.Items.Add("zuidazy");
+            MenuPicker.SelectedIndexChanged += MenuPicker_SelectedIndexChanged;
+            //Default Item
+            MenuPicker.SelectedIndex = 0;
+            MenuItemsListView.ItemsSource = jikzy.mpmm;
         }
 
-        class MainPageMasterViewModel : INotifyPropertyChanged
+        private void MenuPicker_SelectedIndexChanged(object sender, EventArgs e)
         {
-            public ObservableCollection<MainPageMasterMenuItem> MenuItems { get; set; }
-
-            public MainPageMasterViewModel()
+            switch(MenuPicker.SelectedItem)
             {
-                //String hostUrl = "https://drive.google.com/uc?export=download&id=";
-                //MenuItems = new ObservableCollection<MainPageMasterMenuItem>(new[]
-                //{
-                //    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1d2AQ-8rF9HxuioMwK9Uu2ujVgTiFxf0z"), Title = "動漫", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                //    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1iUIcp-IeD8rjn-a84uS9MoslYeoBWe5X"), Title = "電影", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                //    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1gkrl_72IZnsnDKNkcJhkeXGmfmBb73qK"), Title = "陸劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                //    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1ZYjAzED4n6UxgiJvmgoB7jSyLUX7dX_d"), Title = "日劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                //    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "18gxyuOnIK7LCZON-Q6a3YMuWiAhSK6NV"), Title = "韓劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                //    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1vYffF2yHm4Ir0wumoWU-J3uDf-T3wGsY"), Title = "連戲劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                //    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1Cg7vGk_lHhjs62Tgy5lYDWx_sNIdc4SA"), Title = "港劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                //    new MainPageMasterMenuItem { Link = String.Format("{0}{1}", hostUrl, "1HbvikpZuXhQq5RhTPwwM0VrmFbPLmWBR"), Title = "美劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                //});
-                MenuItems = new ObservableCollection<MainPageMasterMenuItem>(new[]
-                {
-                    new MainPageMasterMenuItem { Link = String.Format("{0}", "https://www.jikzy.com/?m=vod-type-id-4-pg-"), Title = "動漫", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                    new MainPageMasterMenuItem { Link = String.Format("{0}", "https://www.jikzy.com/?m=vod-type-id-1-pg-"), Title = "電影", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                    new MainPageMasterMenuItem { Link = String.Format("{0}", "https://www.jikzy.com/?m=vod-type-id-12-pg-"), Title = "陸劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                    new MainPageMasterMenuItem { Link = String.Format("{0}", "https://www.jikzy.com/?m=vod-type-id-14-pg-"), Title = "日劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                    new MainPageMasterMenuItem { Link = String.Format("{0}", "https://www.jikzy.com/?m=vod-type-id-17-pg-"), Title = "韓劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                    new MainPageMasterMenuItem { Link = String.Format("{0}", "https://www.jikzy.com/?m=vod-type-id-2-pg-"), Title = "連戲劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                    new MainPageMasterMenuItem { Link = String.Format("{0}", "https://www.jikzy.com/?m=vod-type-id-13-pg-"), Title = "港劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                    new MainPageMasterMenuItem { Link = String.Format("{0}", "https://www.jikzy.com/?m=vod-type-id-15-pg-"), Title = "歐美劇", TargetType = typeof(VideoList), IconSource = "https://i.imgur.com/Zkw9VFU.png" },
-                });
+                case "jikzy":
+                    MenuItemsListView.ItemsSource = jikzy.mpmm;
+                    break;
+                case "zuidazy":
+                    MenuItemsListView.ItemsSource = zuidazy.mpmm;
+                    break;
             }
+        }
 
-            #region INotifyPropertyChanged Implementation
-            public event PropertyChangedEventHandler PropertyChanged;
-            void OnPropertyChanged([CallerMemberName] string propertyName = "")
-            {
-                if (PropertyChanged == null)
-                    return;
+        private void backupBtn_Clicked(object sender, EventArgs e)
+        {
+            database.BackupAsync();
+        }
 
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            }
-            #endregion
+        private void restoreBtn_Clicked(object sender, EventArgs e)
+        {
+            database.RestoreAsync();
         }
     }
 }

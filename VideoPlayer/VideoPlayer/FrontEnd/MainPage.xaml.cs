@@ -16,6 +16,10 @@ namespace VideoPlayer.FrontEnd
         {
             InitializeComponent();
             MasterPage.ListView.ItemSelected += ListView_ItemSelected;
+            if (Device.RuntimePlatform == Device.UWP)
+            {
+                MasterBehavior = MasterBehavior.Split;
+            }
         }
 
         private void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
@@ -23,13 +27,13 @@ namespace VideoPlayer.FrontEnd
             var item = e.SelectedItem as MainPageMasterMenuItem;
             if (item == null)
                 return;
-
-            var page = (VideoList)Activator.CreateInstance(item.TargetType, item.Link);
+            var page = (VideoList)Activator.CreateInstance(item.TargetType, item.Site, item.Link);
             page.Title = item.Title;
-
             Detail = new NavigationPage(page);
-            IsPresented = false;
-
+            if (Device.RuntimePlatform != Device.UWP)
+            {
+                IsPresented = false;
+            }
             MasterPage.ListView.SelectedItem = null;
         }
     }

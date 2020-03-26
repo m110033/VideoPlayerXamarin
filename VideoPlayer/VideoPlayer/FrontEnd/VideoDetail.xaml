@@ -12,10 +12,9 @@
                 HorizontalOptions="Fill" />
             <StackLayout Orientation="Horizontal" HorizontalOptions="Fill">
                 <Image x:Name="videoImage" Source="{Binding Image}" HorizontalOptions="Start" HeightRequest="200" WidthRequest="200" Aspect="Fill"/>
-                <StackLayout Orientation="Vertical">
-                    <Label x:Name="videoName" Text = "{Binding Name}" FontSize="24"/>
-                    <Label x:Name="videoDescription" Text = "{Binding Description}"/>
-                </StackLayout>
+                <ScrollView Orientation="Vertical" VerticalScrollBarVisibility="Always" HorizontalScrollBarVisibility="Never" HeightRequest="150">
+                    <Label x:Name="videoDescription" Text = "{Binding Description}" LineBreakMode="WordWrap" HorizontalOptions="FillAndExpand"/>
+                </ScrollView>
             </StackLayout>
             <ListView  x:Name="lstView" RowHeight="60">
                 <ListView.ItemTemplate>

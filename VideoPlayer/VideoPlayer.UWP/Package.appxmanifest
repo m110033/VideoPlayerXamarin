@@ -8,8 +8,8 @@
 
   <Identity
     Name="737da68a-7424-415b-b9fb-4ee1b491f828"
-    Publisher="CN=WindVideo Software, O=WindVideo Corporation, C=US"
-    Version="1.0.5.0" />
+    Publisher="CN=WindVideo Software"
+    Version="1.0.14.0" />
 
   <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

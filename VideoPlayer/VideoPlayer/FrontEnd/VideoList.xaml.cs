@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using VideoPlayer.Parser;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -16,121 +17,86 @@ namespace VideoPlayer.FrontEnd
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class VideoList : ContentPage
     {
-        private String hostUrl = "https://www.jikzy.com";
+        private String site = "";
+        private String videoUrl = "";
+        private Boolean isBusy = false;
+        private Common.Tools tool = new Common.Tools();
+        private IPageParser pageParser;
+        private Boolean isFavoritePage = false;
+        private Common.Database database = null;
+        private List<Common.VideoViewModel> favoriteVVM = null;
+        private ObservableCollection<Common.VideoViewModel> videos = new ObservableCollection<Common.VideoViewModel>();
 
-        private String pageUrl { get; set; }
-
-        private int pageNum { get; set; }
-
-        private Common.Tools tool { get; set; }
-
-        private Boolean isBusy { get; set; }
-
-        public ObservableCollection<Common.VideoViewModel> videos { get; set; }
-
-        public VideoList(String videoUrl)
+        public VideoList(String site, String videoUrl)
         {
             InitializeComponent();
-            pageUrl = videoUrl;
-            videos = new ObservableCollection<Common.VideoViewModel>();
-            lstView.ItemsSource = videos;
-            lstView.ItemSelected += ListView_ItemSelected;
-            lstView.ItemAppearing += LstView_ItemAppearing;
+            if (database == null)
+            {
+                database = new Common.Database();
+                favoriteVVM = database.getVideo();
+            }
+            this.site = site;
+            this.videoUrl = videoUrl;
+            // Get Parser
+            switch (this.site)
+            {
+                case "zuidazy":
+                    pageParser = new ZUIDAZY();
+                    break;
+                case "jikzy":
+                    pageParser = new JIKZY();
+                    break;
+            }
+            isFavoritePage = (videoUrl.CompareTo("FAVORITE") == 0) ? true : false;
+            listView.ItemsSource = videos;
+            // Bind events
+            listView.ItemSelected += ListView_ItemSelected;
+            listView.ItemAppearing += listView_ItemAppearing;
             loadMoreButton.Clicked += LoadMoreButton_Clicked;
-            pageNum++;
-            LoadData();
+            // Load Videos
+            if (isFavoritePage)
+            {
+                loadMoreButton.IsVisible = false;
+                foreach (var video in favoriteVVM)
+                {
+                    video.Image = video.Favorite ? tool.LIKEURL : tool.DISLIKEURL;
+                    videos.Add(video);
+                }
+            }
+            else
+            {
+                LoadData();
+            }
         }
-
         private void LoadMoreButton_Clicked(object sender, EventArgs e)
         {
             if (isBusy || videos.Count == 0)
                 return;
-            AppearData();
+            if (!isFavoritePage) LoadData();
         }
-
-        private void LstView_ItemAppearing(object sender, ItemVisibilityEventArgs e)
+        private void listView_ItemAppearing(object sender, ItemVisibilityEventArgs e)
         {
             if (isBusy || videos.Count == 0)
                 return;
-
-            //hit bottom!
-            if ((Common.VideoViewModel)e.Item == videos[videos.Count - 1])
+            if ((Common.VideoViewModel)e.Item == videos[videos.Count - 1] && !isFavoritePage)
             {
-                AppearData();
+                LoadData();
             }
         }
-
-        private void AppearData()
-        {
-            defaultActivityIndicator.IsRunning = true;
-            defaultActivityIndicator.IsVisible = true;
-            Task.Run(async () =>
-            {
-                pageNum++;
-                await LoadData();
-
-            });
-        }
-
-        async Task LoadData()
+        private void LoadData()
         {
             if (isBusy) return;
-            isBusy = true;
-            String videoUrl = String.Format("{0}{1}.html", pageUrl, pageNum);
-            if (tool == null)
+            isBusy = defaultActivityIndicator.IsVisible = defaultActivityIndicator.IsRunning = true;
+            loadMoreButton.IsVisible = false;
+            Task.Run(async () =>
             {
-                tool = new Common.Tools();
-            }
-            String html = tool.GetHtml(videoUrl);
-            Regex regex = new Regex("<td class=\"l\"><a href=\"(.*?)\" target|_blank\">(.*?)<font color=\"red\">(.*?)</font>|\">(.*?)</font></td>", RegexOptions.Multiline);
-            MatchCollection matches = regex.Matches(html);
-            List<Common.VideoViewModel> vvm = new List<Common.VideoViewModel>();
-            for (int i = 0; i < matches.Count; i++)
-            {
-                try
-                {
-                    GroupCollection linkG = matches[i++].Groups;
-                    GroupCollection titleG = matches[i++].Groups;
-                    GroupCollection dateG = matches[i].Groups;
-                    String link = String.Format("{0}{1}", hostUrl, linkG[1].ToString().Trim());
-                    String title = String.Format("{0} - {1}", titleG[2].Value.Trim(), titleG[3].Value.Trim());
-                    String date = dateG[4].Value.Trim();
-                    vvm.Add(new Common.VideoViewModel { Name = title, Date = date, Image = "", Link = link });
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            List<String> titleList = new List<String>();
-            for (int i = 0; i < vvm.Count; i++)
-            {
-                titleList.Add(vvm[i].Name);
-            }
-            titleList = tool.PostHtml("http://www.khngai.com/chinese/tools/convert.php", titleList);
-            try
-            {
+                List<Common.VideoViewModel> vvm = pageParser.GetList(videoUrl);
                 Device.BeginInvokeOnMainThread(() => {
-                    for (int i = 0; i < vvm.Count; i++)
-                    {
-                        vvm[i].Name = titleList[i];
-                        videos.Add(vvm[i]);
-                    }
-                    defaultActivityIndicator.IsRunning = false;
-                    defaultActivityIndicator.IsVisible = false;
-                    isBusy = false;
+                    foreach (var item in vvm) videos.Add(item);
+                    isBusy = defaultActivityIndicator.IsVisible = defaultActivityIndicator.IsRunning = false;
+                    loadMoreButton.IsVisible = true;
                 });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                defaultActivityIndicator.IsRunning = false;
-                isBusy = false;
-            }
-            isBusy = false;
+            });
         }
 
         async private void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
@@ -138,7 +104,29 @@ namespace VideoPlayer.FrontEnd
             var item = e.SelectedItem as Common.VideoViewModel;
             if (item == null)
                 return;
-            await Navigation.PushAsync(new VideoDetail(item.Link));
+            await Navigation.PushAsync(new VideoDetail(item.Site, item.Link));
+        }
+
+        private void SearchBar_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            listView.ItemsSource = videos.Where(item => item.Name.Contains(listSearch.Text));
+        }
+
+        private void FavoriteButton_Clicked(object sender, EventArgs e)
+        {
+            ImageButton button = (ImageButton)sender;
+            Common.VideoViewModel vvm = (Common.VideoViewModel)button.Source.BindingContext;
+            vvm.Favorite = vvm.Favorite ^ true;
+            if (vvm.Favorite)
+            {
+                button.Source = tool.LIKEURL;
+                database.addVideo(vvm);
+            }
+            else
+            {
+                button.Source = tool.DISLIKEURL;
+                database.removeVideo(vvm);
+            }
         }
     }
 }

@@ -2,3 +2,4 @@ bin/
 obj/
 AppPackages/
 *.pfx
+*.7z

@@ -19,10 +19,14 @@
                  TextColor="White"
                  HorizontalOptions="Center"/>
         </StackLayout>
+        <StackLayout Orientation="Horizontal">
+            <Button x:Name="backupBtn" Text="備份" HorizontalOptions="FillAndExpand" Clicked="backupBtn_Clicked"/>
+            <Button x:Name="restoreBtn" Text="還原" HorizontalOptions="FillAndExpand" Clicked="restoreBtn_Clicked"/>
+        </StackLayout>
+        <Picker x:Name="MenuPicker"/>
         <ListView x:Name="MenuItemsListView"
               SeparatorVisibility="None"
-              HasUnevenRows="true"
-              ItemsSource="{Binding MenuItems}">
+              HasUnevenRows="true">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
