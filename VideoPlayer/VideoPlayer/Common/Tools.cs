@@ -26,16 +26,16 @@ namespace VideoPlayer.Common
 
         public List<String> SCToTC(List<String> dataList)
         {
-            String url = "https://www.purpleculture.net/traditional-simplified-converter/";
+            String url = "http://www.khngai.com/chinese/tools/convert.php";
             HttpClient client = new HttpClient();
             String data = String.Join("<br>", dataList.ToArray());
-            string FormStuff = string.Format("hanzi={0}&type=sctc", data);
+            string FormStuff = string.Format("data={0}&action=Simplified+to+Traditional", data);
             StringContent content = new StringContent(FormStuff, Encoding.UTF8, "application/x-www-form-urlencoded");
             HttpResponseMessage response = client.PostAsync(url, content).GetAwaiter().GetResult();
             String tempHtml = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
             HtmlDocument document = new HtmlDocument();
             document.LoadHtml(tempHtml);
-            var container = document.DocumentNode.Descendants("textarea").FirstOrDefault(x => x.Attributes.Contains("id") && x.Attributes["id"].Value == "hanzi");
+            var container = document.DocumentNode.Descendants("textarea").FirstOrDefault(x => x.Attributes.Contains("class") && x.Attributes["class"].Value == "wsuni");
             if (container != null)
             {
                 String result = container.InnerText.Trim();

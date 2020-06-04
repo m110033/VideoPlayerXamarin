@@ -68,6 +68,7 @@ namespace VideoPlayer.FrontEnd
             if (item == null)
                 return;
             await Navigation.PushModalAsync(new WebVideoPage(item.Link));
+            lstView.SelectedItem = null;
         }
     }
 }

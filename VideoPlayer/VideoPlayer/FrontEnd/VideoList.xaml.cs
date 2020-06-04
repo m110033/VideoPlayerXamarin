@@ -105,6 +105,7 @@ namespace VideoPlayer.FrontEnd
             if (item == null)
                 return;
             await Navigation.PushAsync(new VideoDetail(item.Site, item.Link));
+            listView.SelectedItem = null;
         }
 
         private void SearchBar_TextChanged(object sender, TextChangedEventArgs e)

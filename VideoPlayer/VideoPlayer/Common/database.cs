@@ -49,47 +49,47 @@ namespace VideoPlayer.Common
         }
         public async System.Threading.Tasks.Task BackupAsync()
         {
-            //await DependencyService.Get<IDatabaseTool>().BackupAsync(getVideo());
+            await DependencyService.Get<IDatabaseTool>().BackupAsync(getVideo());
 
-            List<Common.VideoViewModel> vvm = getVideo();
-            try
-            {
-                string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DatabaseResource.txt");
-                using (var writer = new System.IO.StreamWriter(fileName))
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<Common.VideoViewModel>));//initialises the serialiser
-                    serializer.Serialize(writer, vvm);
-                    await writer.FlushAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            //List<Common.VideoViewModel> vvm = getVideo();
+            //try
+            //{
+            //    string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DatabaseResource.txt");
+            //    using (var writer = new System.IO.StreamWriter(fileName))
+            //    {
+            //        XmlSerializer serializer = new XmlSerializer(typeof(List<Common.VideoViewModel>));//initialises the serialiser
+            //        serializer.Serialize(writer, vvm);
+            //        await writer.FlushAsync();
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message);
+            //}
         }
         public async System.Threading.Tasks.Task RestoreAsync()
         {
-            //List<Common.VideoViewModel> vvms = await DependencyService.Get<IDatabaseTool>().RestoreAsync();
+            List<Common.VideoViewModel> vvms = await DependencyService.Get<IDatabaseTool>().RestoreAsync();
 
-            try
+            //try
+            //{
+            //    string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DatabaseResource.txt");
+            //    List<Common.VideoViewModel> vvms;
+            //    using (var reader = new StreamReader(fileName))
+            //    {
+            //        var serializer = new XmlSerializer(typeof(List<Common.VideoViewModel>));
+            //        vvms = (List<Common.VideoViewModel>)serializer.Deserialize(reader);
+            //    }
+            //    removeVideo();
+            foreach (var vvm in vvms)
             {
-                string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DatabaseResource.txt");
-                List<Common.VideoViewModel> vvms;
-                using (var reader = new StreamReader(fileName))
-                {
-                    var serializer = new XmlSerializer(typeof(List<Common.VideoViewModel>));
-                    vvms = (List<Common.VideoViewModel>)serializer.Deserialize(reader);
-                }
-                removeVideo();
-                foreach (var vvm in vvms)
-                {
-                    db.Insert(vvm);
-                }
+                db.Insert(vvm);
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message);
+            //}
         }
     }
     public interface IDatabaseTool
